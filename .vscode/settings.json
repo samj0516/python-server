@@ -1,3 +1,12 @@
 {
-    "python.pythonPath": "/Users/samanthacampbell/.local/share/virtualenvs/python-server-UbwC1dCu/bin/python"
+    "python.pythonPath": "/Users/samanthacampbell/.local/share/virtualenvs/python-server-UbwC1dCu/bin/python",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "Python Kennels",
+            "database": "kennel.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }
