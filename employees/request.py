@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Employee
+from models import Employee, Location
 EMPLOYEES = [
     {
       "id": 1,
@@ -43,8 +43,12 @@ def get_all_employees():
         SELECT
             a.id,
             a.name,
-            a.location_id
-        FROM employee a
+            a.location_id,
+            l.name location_name,
+            l.address location_address
+        FROM Employee a
+        JOIN Location l
+            ON l.id = a.location_id
           """)
         employees = []
 
@@ -52,6 +56,8 @@ def get_all_employees():
 
         for row in dataset:
             employee = Employee(row['id'], row['name'], row['location_id'])
+            location = Location(row['location_id'], row['location_name'], row['location_address'])
+            employee.location = location.__dict__
             employees.append(employee.__dict__)
         return json.dumps(employees)
 
@@ -67,7 +73,11 @@ def get_single_employee(id):
             a.id,
             a.name,
             a.location_id
-        FROM employee a
+            l.name location_name,
+            l.address location_address
+        FROM Employee a
+        JOIN Location l
+            ON l.id = a.location_id
         WHERE a.id = ?
         """, ( id, ))
 
@@ -76,7 +86,9 @@ def get_single_employee(id):
 
         # Create an animal instance from the current row
         employee = Employee(data['id'], data['name'], data['location_id'])
-
+        location = Location(data['location_id'], data['location_name'], data['location_address'])
+        employee.location = location.__dict__
+        employee.append(employee.__dict__)
         return json.dumps(employee.__dict__)
 
 def get_employees_by_location(location):

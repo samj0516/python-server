@@ -1,4 +1,4 @@
-from animals.request import get_animals_by_status
+from animals.request import get_animals_by_status, update_animal
 import json
 from customers.request import get_all_customers, get_single_customer, create_customer, delete_customer, update_customer, get_customers_by_email
 from employees.request import get_all_employees, get_single_employee, create_employee, delete_employee, update_employee, get_employees_by_location
@@ -86,6 +86,16 @@ class HandleRequests(BaseHTTPRequestHandler):
                     response = f"{get_single_customer(id)}"
                 else:
                     response = f"{get_all_customers()}"
+            elif resource == "employees":
+                if id is not None:
+                    response = f"{get_single_employee(id)}"
+                else:
+                    response = f"{get_all_employees()}"
+            elif resource == "locations":
+                if id is not None:
+                    response = f"{get_single_location(id)}"
+                else:
+                    response = f"{get_all_locations()}"
 
         # Response from parse_url() is a tuple with 3
         # items in it, which means the request was for
@@ -163,26 +173,29 @@ class HandleRequests(BaseHTTPRequestHandler):
     # Here's a method on the class that overrides the parent's method.
     # It handles any PUT request.
     def do_PUT(self):
-        self._set_headers(204)
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
 
         # Parse the URL
         (resource, id) = self.parse_url(self.path)
-
+        success = False
         # Delete a single animal from the list
         if resource == "animals":
-            update_animal(id, post_body)
+            success = update_animal(id, post_body)
         elif resource == "customers":
             update_customer(id, post_body)
         elif resource == "employees":
             update_employee(id, post_body)
         elif resource == "locations":
             update_location(id, post_body)
+        if success:
+            self._set_headers(204)
+        else:
+            self._set_headers(404)
 
-        # Encode the new animal and send in response
         self.wfile.write("".encode())
+        
 
 
 # This function is not inside the class. It is the starting
