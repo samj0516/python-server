@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Location
+from models import Location, Animal, Employee, employee
 LOCATIONS = [
     {
       "id": 1,
@@ -61,8 +61,16 @@ def get_single_location(id):
         SELECT
             a.id,
             a.name,
-            a.address
+            a.address,
+            l.id animal_id,
+            l.name animal_name,
+            e.id employee_id,
+            e.name employee_name
         FROM location a
+        JOIN Animal l
+            ON a.id = l.location_id
+        JOIN Employee e
+            ON a.id = e.location_id
         WHERE a.id = ?
         """, ( id, ))
 
@@ -71,8 +79,16 @@ def get_single_location(id):
 
         # Create an animal instance from the current row
         location = Location(data['id'], data['name'], data['address'])
-
-        return json.dumps(location.__dict__)
+        animal = Animal(data['id'], 
+                          data['name'], 
+                          data['breed'], 
+                          data['status'], 
+                          data['location_id'], 
+                          data['customer_id'])
+        location.animal = animal.__dict__
+        employee = Employee(data['id'], data['name'], data['address'], data['location_id'])
+        location.employee = employee.__dict__
+    return json.dumps(location.__dict__)
 
 def create_location(location):
     
